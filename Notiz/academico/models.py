@@ -1,6 +1,6 @@
-# academico/models.py
 from django.db import models
 from usuarios.models import Usuario
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Institucion(models.Model):
     nombre = models.CharField(max_length=200)
