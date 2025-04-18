@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Ver mensaje{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="{% url 'bandeja_entrada' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-inbox"></i> Bandeja de entrada
+                </a>
+                <a href="{% url 'mensajes_enviados' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-paper-plane"></i> Enviados
+                </a>
+                <a href="{% url 'nuevo_mensaje' %}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-edit"></i> Nuevo mensaje
+                </a>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ mensaje.asunto }}</h5>
+                    <div>
+                        <a href="{% url 'nuevo_mensaje' %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-reply"></i> Responder
+                        </a>
+                        <a href="{% if request.user == mensaje.receptor %}{% url 'bandeja_entrada' %}{% else %}{% url 'mensajes_enviados' %}{% endif %}" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <strong>De:</strong> {{ mensaje.emisor.get_full_name|default:mensaje.emisor.username }}
+                                <br>
+                                <strong>Para:</strong> {{ mensaje.receptor.get_full_name|default:mensaje.receptor.username }}
+                            </div>
+                            <div class="text-end">
+                                <span class="text-muted">{{ mensaje.fecha_envio|date:"d/m/Y H:i" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mensaje-contenido border-top pt-3">
+                        <p>{{ mensaje.contenido|linebreaks }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

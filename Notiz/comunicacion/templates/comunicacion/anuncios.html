@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Anuncios generales{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Anuncios generales</h5>
+                    {% if user.is_staff %}
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#nuevoAnuncioForm">
+                            <i class="fas fa-plus"></i> Nuevo anuncio
+                        </button>
+                    {% endif %}
+                </div>
+                
+                {% if user.is_staff %}
+                    <div class="collapse" id="nuevoAnuncioForm">
+                        <div class="card-body border-bottom">
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="id_titulo" class="form-label">Título</label>
+                                    <input type="text" name="titulo" id="id_titulo" class="form-control" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="id_contenido" class="form-label">Contenido</label>
+                                    <textarea name="contenido" id="id_contenido" rows="5" class="form-control" required></textarea>
+                                </div>
+                                
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" name="visible" id="id_visible" class="form-check-input" checked>
+                                    <label for="id_visible" class="form-check-label">Visible para todos los usuarios</label>
+                                </div>
+                                
+                                <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-secondary me-2" data-bs-toggle="collapse" data-bs-target="#nuevoAnuncioForm">Cancelar</button>
+                                    <button type="submit" class="btn btn-primary">Publicar anuncio</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    {% if anuncios %}
+                        <div class="accordion" id="anunciosAccordion">
+                            {% for anuncio in anuncios %}
+                                {% if anuncio.visible or user.is_staff %}
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="heading{{ anuncio.id }}">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ anuncio.id }}" aria-expanded="false" aria-controls="collapse{{ anuncio.id }}">
+                                                <div class="d-flex w-100 justify-content-between">
+                                                    <div>
+                                                        {{ anuncio.titulo }}
+                                                        {% if not anuncio.visible %}
+                                                            <span class="badge bg-warning ms-2">Oculto</span>
+                                                        {% endif %}
+                                                    </div>
+                                                    <small class="text-muted ms-2">{{ anuncio.fecha_publicacion|date:"d/m/Y" }}</small>
+                                                </div>
+                                            </button>
+                                        </h2>
+                                        <div id="collapse{{ anuncio.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ anuncio.id }}" data-bs-parent="#anunciosAccordion">
+                                            <div class="accordion-body">
+                                                <div class="mb-3">
+                                                    <p>{{ anuncio.contenido|linebreaks }}</p>
+                                                </div>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">
+                                                        Publicado por: {{ anuncio.autor.get_full_name|default:anuncio.autor.username }}
+                                                    </small>
+                                                    {% if user.is_staff %}
+                                                        <div>
+                                                            <a href="#" class="btn btn-sm btn-outline-primary">Editar</a>
+                                                            {% if anuncio.visible %}
+                                                                <a href="#" class="btn btn-sm btn-outline-warning">Ocultar</a>
+                                                            {% else %}
+                                                                <a href="#" class="btn btn-sm btn-outline-success">Mostrar</a>
+                                                            {% endif %}
+                                                            <a href="#" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center p-5">
+                            <i class="fas fa-bullhorn fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No hay anuncios publicados.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
